@@ -4,60 +4,62 @@ class User
 {
     private $conn;
 
-    // ñâîéñòâà
+    // ÑÐ²Ð¾Ð¹ÑÑ‚Ð²Ð°
     public $id;
     public $surname;
     public $name;
     public $patronymic;
     public $city;
 
-    // êîíñòðóêòîð äëÿ ñîåäèíåíèÿ ñ áàçîé äàííûõ
+   // ÐºÐ¾Ð½ÑÑ‚Ñ€ÑƒÐºÑ‚Ð¾Ñ€ Ð´Ð»Ñ ÑÐ¾ÐµÐ´Ð¸Ð½ÐµÐ½Ð¸Ñ Ñ Ð±Ð°Ð·Ð¾Ð¹ Ð´Ð°Ð½Ð½Ñ‹Ñ…
     public function __construct($db)
     {
         $this->conn = $db;
     }
 
-    /** ÷òåíèå âñåõ çàïèñåé èç òàáëèöû user_info
+    /** Ñ‡Ñ‚ÐµÐ½Ð¸Ðµ Ð²ÑÐµÑ… Ð·Ð°Ð¿Ð¸ÑÐµÐ¹ Ð¸Ð· Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ñ‹ user_info
+    * @return bool Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ true ÐµÑÐ»Ð¸ Ð·Ð°Ð¿Ñ€Ð¾Ñ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½, Ð¸Ð½Ð°Ñ‡Ðµ false
      */
     function read()
     {
-        // âûáèðàåì âñå çàïèñè
+        // Ð²Ñ‹Ð±Ð¸Ñ€Ð°ÐµÐ¼ Ð²ÑÐµ Ð·Ð°Ð¿Ð¸ÑÐ¸
         $query = "
             SELECT ui.id, ui.surname, ui.name, ui.patronymic, uc.name
             FROM user_info ui
             LEFT JOIN user_city uc ON p.category_id = uc.id
             ORDER BY ui.surname, ui.name, ui.patronymic";
-        // ïîäãîòîâêà çàïðîñà
+       // Ð¿Ð¾Ð´Ð³Ð¾Ñ‚Ð¾Ð²ÐºÐ° Ð·Ð°Ð¿Ñ€Ð¾ÑÐ°
         $stmt = $this->conn->prepare($query);
-        // âûïîëíÿåì çàïðîñ
+        // Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÑÐµÐ¼ Ð·Ð°Ð¿Ñ€Ð¾Ñ
         $stmt->execute();
         return $stmt;
     }
 
-    /** ïîëó÷åíèÿ êîíêðåòíîãî ïîëüçîâàòåëÿ ïî ID
+    /** Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½Ð¸Ñ ÐºÐ¾Ð½ÐºÑ€ÐµÑ‚Ð½Ð¾Ð³Ð¾ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ Ð¿Ð¾ ID
+    * @return bool Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ true ÐµÑÐ»Ð¸ Ð·Ð°Ð¿Ñ€Ð¾Ñ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½, Ð¸Ð½Ð°Ñ‡Ðµ false
      */
     function readOne()
     {
-        // çàïðîñ äëÿ ÷òåíèÿ îäíîãî ïîëüçîâàòåëÿ
+        // Ð·Ð°Ð¿Ñ€Ð¾Ñ Ð´Ð»Ñ Ñ‡Ñ‚ÐµÐ½Ð¸Ñ Ð¾Ð´Ð½Ð¾Ð³Ð¾ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ
         $query = "
             SELECT ui.id, ui.surname, ui.name, ui.patronymic, uc.name city_name
             FROM user_info ui
             LEFT JOIN user_city uc ON p.category_id = uc.id
             WHERE ui.id = ':id'";
 
-        // ïîäãîòîâêà çàïðîñà
+        // Ð¿Ð¾Ð´Ð³Ð¾Ñ‚Ð¾Ð²ÐºÐ° Ð·Ð°Ð¿Ñ€Ð¾ÑÐ°
         $stmt = $this->conn->prepare($query);
 
-        // ïðèâÿçûâàåì id òîâàðà, êîòîðûé áóäåò ïîëó÷åí
+        // Ð¿Ñ€Ð¸Ð²ÑÐ·Ñ‹Ð²Ð°ÐµÐ¼ id Ñ‚Ð¾Ð²Ð°Ñ€Ð°, ÐºÐ¾Ñ‚Ð¾Ñ€Ñ‹Ð¹ Ð±ÑƒÐ´ÐµÑ‚ Ð¿Ð¾Ð»ÑƒÑ‡ÐµÐ½
         $stmt->bindParam(":id", $this->id);
 
-        // âûïîëíÿåì çàïðîñ
+        // Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÑÐµÐ¼ Ð·Ð°Ð¿Ñ€Ð¾Ñ
         $stmt->execute();
 
-        // ïîëó÷àåì èçâëå÷åííóþ ñòðîêó
+        // Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÐ¼ Ð¸Ð·Ð²Ð»ÐµÑ‡ÐµÐ½Ð½ÑƒÑŽ ÑÑ‚Ñ€Ð¾ÐºÑƒ
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        // óñòàíîâèì çíà÷åíèÿ ñâîéñòâ îáúåêòà
+        // ÑƒÑÑ‚Ð°Ð½Ð¾Ð²Ð¸Ð¼ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ ÑÐ²Ð¾Ð¹ÑÑ‚Ð² Ð¾Ð±ÑŠÐµÐºÑ‚Ð°
         $this->id = $row["id"];
         $this->surname = $row["surname"];
         $this->name = $row["name"];
@@ -65,16 +67,17 @@ class User
         $this->city = $row["city_name"];
     }
 
-    /** ñîçäàíèå ïîëüçîâàòåëÿ
+    /** ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ðµ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ
+    * @return bool Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ true ÐµÑÐ»Ð¸ Ð·Ð°Ð¿Ñ€Ð¾Ñ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½, Ð¸Ð½Ð°Ñ‡Ðµ false
      */
     function create()
     {
-        // çàïðîñ äëÿ âñòàâêè çàïèñè
+        // Ð·Ð°Ð¿Ñ€Ð¾Ñ Ð´Ð»Ñ Ð²ÑÑ‚Ð°Ð²ÐºÐ¸ Ð·Ð°Ð¿Ð¸ÑÐ¸
         $query = "
             INSERT INTO user_info
             SET surname=':surname', name=':name', patronymic=':patronymic', city=':city'";
 
-        // ïîäãîòîâêà çàïðîñà
+       // Ð¿Ð¾Ð´Ð³Ð¾Ñ‚Ð¾Ð²ÐºÐ° Ð·Ð°Ð¿Ñ€Ð¾ÑÐ°
         $stmt = $this->conn->prepare($query);
 
         $this->surname = htmlspecialchars(strip_tags($this->surname));
@@ -82,49 +85,51 @@ class User
         $this->patronymic = htmlspecialchars(strip_tags($this->patronymic));
         $this->city = htmlspecialchars(strip_tags($this->city));
 
-        // ïðèâÿçêà çíà÷åíèé
+       // Ð¿Ñ€Ð¸Ð²ÑÐ·ÐºÐ° Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ð¹
         $stmt->bindParam(":surname", $this->surname);
         $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":patronymic", $this->patronymic);
         $stmt->bindParam(":city", $this->city);
 
-        // âûïîëíÿåì çàïðîñ
+        // Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÑÐµÐ¼ Ð·Ð°Ð¿Ñ€Ð¾Ñ
         if ($stmt->execute()) {
             return true;
         }
         return false;
     }
 
-    /** óäàëåíèå ïîëüçîâàòåëÿ
+    /** ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ðµ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ
+    * @return bool Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ true ÐµÑÐ»Ð¸ Ð·Ð°Ð¿Ñ€Ð¾Ñ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½, Ð¸Ð½Ð°Ñ‡Ðµ false
      */
     function delete()
     {
-        // çàïðîñ äëÿ óäàëåíèÿ çàïèñè (òîâàðà)
+        // Ð·Ð°Ð¿Ñ€Ð¾Ñ Ð´Ð»Ñ ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ñ Ð·Ð°Ð¿Ð¸ÑÐ¸
         $query = "
             DELETE FROM user_info 
             WHERE id = ':id'";
 
-        // ïîäãîòîâêà çàïðîñà
+        // Ð¿Ð¾Ð´Ð³Ð¾Ñ‚Ð¾Ð²ÐºÐ° Ð·Ð°Ð¿Ñ€Ð¾ÑÐ°
         $stmt = $this->conn->prepare($query);
 
-        // î÷èñòêà
+        // Ð¾Ñ‡Ð¸Ñ‚ÐºÐ°
         $this->id = htmlspecialchars(strip_tags($this->id));
 
-        // ïðèâÿçûâàåì id çàïèñè äëÿ óäàëåíèÿ
+        // Ð¿Ñ€Ð¸Ð²ÑÐ·Ñ‹Ð²Ð°ÐµÐ¼ id Ð·Ð°Ð¿Ð¸ÑÐ¸ Ð´Ð»Ñ ÑƒÐ´Ð°Ð»ÐµÐ½Ð¸Ñ
         $stmt->bindParam(":id", $this->id);
 
-        // âûïîëíÿåì çàïðîñ
+        // Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÑÐµÐ¼ Ð·Ð°Ð¿Ñ€Ð¾Ñ
         if ($stmt->execute()) {
             return true;
         }
         return false;
     }
 
-    /** îáíîâëåíèÿ èíôîðìàöèè î ïîëüçîâàòåëå
+    /** Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð¸Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ð¸ Ð¾ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ðµ
+    * @return bool Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ true ÐµÑÐ»Ð¸ Ð·Ð°Ð¿Ñ€Ð¾Ñ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½, Ð¸Ð½Ð°Ñ‡Ðµ false
      */
     function update()
     {
-        // çàïðîñ äëÿ îáíîâëåíèÿ çàïèñè
+        // Ð·Ð°Ð¿Ñ€Ð¾Ñ Ð´Ð»Ñ Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð·Ð°Ð¿Ð¸ÑÐ¸
         $query = "
             UPDATE user_info
             SET surname = :surname,
@@ -133,39 +138,42 @@ class User
                 city = :city
             WHERE id = :id";
 
-        // ïîäãîòîâêà çàïðîñà
+        // Ð¿Ð¾Ð´Ð³Ð¾Ñ‚Ð¾Ð²ÐºÐ° Ð·Ð°Ð¿Ñ€Ð¾ÑÐ°
         $stmt = $this->conn->prepare($query);
 
-        // î÷èñòêà
+        // Ð¾Ñ‡Ð¸ÑÑ‚ÐºÐ°
         $this->surname = htmlspecialchars(strip_tags($this->surname));
         $this->name = htmlspecialchars(strip_tags($this->name));
         $this->patronymic = htmlspecialchars(strip_tags($this->patronymic));
         $this->city = htmlspecialchars(strip_tags($this->city));
 
-        // ïðèâÿçûâàåì çíà÷åíèÿ
+        // Ð¿Ñ€Ð¸Ð²ÑÐ·Ñ‹Ð²Ð°ÐµÐ¼ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ñ
         $stmt->bindParam(":surname", $this->surname);
         $stmt->bindParam(":name", $this->name);
         $stmt->bindParam(":patronymic", $this->patronymic);
         $stmt->bindParam(":city", $this->city);
 
-        // âûïîëíÿåì çàïðîñ
+        // Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÑÐµÐ¼ Ð·Ð°Ð¿Ñ€Ð¾Ñ
         if ($stmt->execute()) {
             return true;
         }
         return false;
     }
 
-    /** êîëè÷åñòâî ïîëüçîâàòåëåé
+    /** ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹
+    * @return int Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰Ð°ÐµÑ‚ Ñ‡Ð¸ÑÐ»Ð¾ - ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»ÐµÐ¹ Ð² Ñ‚Ð°Ð±Ð»Ð¸Ñ†Ðµ
      */
     public function count()
     {
         $query = "
             SELECT COUNT(*) as count_user 
             FROM user_info";
-
+        // Ð¿Ð¾Ð´Ð³Ð¾Ñ‚Ð¾Ð²ÐºÐ° Ð·Ð°Ð¿Ñ€Ð¾ÑÐ°
         $stmt = $this->conn->prepare($query);
+        // Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÑÐµÐ¼ Ð·Ð°Ð¿Ñ€Ð¾Ñ
         $stmt->execute();
 
+        // Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÐ¼ Ð¸Ð·Ð²Ð»ÐµÑ‡ÐµÐ½Ð½ÑƒÑŽ ÑÑ‚Ñ€Ð¾ÐºÑƒ
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return intval($row["count_user"]);
